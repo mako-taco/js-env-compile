@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+
+
+/*
+	jsenv --use-null-on-missing <file.js
+*/
+
+// const RE_ENV_COMMENT = /\/\*\*\s+\$(\S*?)\s+\*\//gm;
+const RE_ENV_COMMENT = /\$ENV\.([^\s;]+)/gm; 
+
+var buffer = '';
+
+process.stdin.setEncoding('utf8');
+
+process.stdin.on('data', function (chunk) {
+
+	RE_ENV_COMMENT.lastIndex = 0;
+	if (chunk === null) {
+		return;
+	}
+
+	buffer += chunk;
+	var match = RE_ENV_COMMENT.exec(buffer);
+	var lastMatchEnd = 0;
+	while(match) {
+		var envVarName = match[1]; 
+		process.stdout.write(buffer.substring(lastMatchEnd, match.index));
+		
+		if(process.env.hasOwnProperty(envVarName)) {
+			process.stdout.write(process.env[envVarName]);
+		}
+		else {
+			process.stdout.write('null');
+		}
+
+		lastMatchEnd = RE_ENV_COMMENT.lastIndex;
+		match = RE_ENV_COMMENT.exec(buffer);
+	}
+
+	buffer = buffer.substring(RE_ENV_COMMENT.lastIndex);
+});
+
+process.stdin.on('end', function() {
+	process.exit(0); 
+});

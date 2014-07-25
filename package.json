@@ -1,0 +1,19 @@
+{
+  "name": "js-env-compile",
+  "version": "0.0.0",
+  "description": "js-env-compile ==============",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mako-taco/js-env-compile.git"
+  },
+  "author": "Jake Scott",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mako-taco/js-env-compile/issues"
+  },
+  "homepage": "https://github.com/mako-taco/js-env-compile"
+}

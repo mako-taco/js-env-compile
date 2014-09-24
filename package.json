@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/mako-taco/js-env-compile/issues"
   },
-  "homepage": "https://github.com/mako-taco/js-env-compile"
+  "homepage": "https://github.com/mako-taco/js-env-compile",
+  "dependencies": {
+    "yargs": "^1.3.1"
+  }
 }

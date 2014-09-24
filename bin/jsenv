@@ -1,45 +1,57 @@
 #!/usr/bin/env node
 
+var argv = require('yargs')
+    .usage('Replaces things with environment variables.\nUsage: $0 {ARGS} < {INFILE} > {OUTFILE}')
+    .describe('x', 'symbol to replace')
+    .alias('x','replacer')
+    .default('x', '$ENV')
+    .describe('d', 'default value when an environment var is not present')
+    .alias('d','default')
+    .default('d', 'null')
+    .argv;
 
-/*
-	jsenv --use-null-on-missing <file.js
-*/
-
-// const RE_ENV_COMMENT = /\/\*\*\s+\$(\S*?)\s+\*\//gm;
-const RE_ENV_COMMENT = /\$ENV\.([^\s;]+)/gm; 
-
+var cleanSymbol = argv.replacer.replace(/([$])/g,'\\$1')
+var RE_ENV_COMMENT = new RegExp(cleanSymbol + '\\.([A-Za-z0-9_$]+)', 'gm');
 var buffer = '';
 
 process.stdin.setEncoding('utf8');
 
-process.stdin.on('data', function (chunk) {
+function processBuffer() {
+	var lines = buffer.split('\n');
+	buffer = lines.pop() + '\n';
 
-	RE_ENV_COMMENT.lastIndex = 0;
+	lines.forEach(function (line) {
+		line += '\n';
+		RE_ENV_COMMENT.lastIndex = 0;
+		var match = RE_ENV_COMMENT.exec(line);
+		var lastMatchEnd = 0;
+		while(match) {
+			var envVarName = match[1]; 
+			process.stdout.write(line.substring(lastMatchEnd, match.index));
+			
+			if(process.env.hasOwnProperty(envVarName)) {
+				process.stdout.write(process.env[envVarName]);
+			}
+			else {
+				process.stdout.write(argv.default);
+			}
+
+			lastMatchEnd = RE_ENV_COMMENT.lastIndex;
+			match = RE_ENV_COMMENT.exec(line);
+		}
+		process.stdout.write(line.substring(lastMatchEnd));
+	});
+}
+
+process.stdin.on('data', function (chunk) {
 	if (chunk === null) {
 		return;
 	}
-
 	buffer += chunk;
-	var match = RE_ENV_COMMENT.exec(buffer);
-	var lastMatchEnd = 0;
-	while(match) {
-		var envVarName = match[1]; 
-		process.stdout.write(buffer.substring(lastMatchEnd, match.index));
-		
-		if(process.env.hasOwnProperty(envVarName)) {
-			process.stdout.write(process.env[envVarName]);
-		}
-		else {
-			process.stdout.write('null');
-		}
-
-		lastMatchEnd = RE_ENV_COMMENT.lastIndex;
-		match = RE_ENV_COMMENT.exec(buffer);
-	}
-
-	buffer = buffer.substring(RE_ENV_COMMENT.lastIndex);
+	processBuffer();
 });
 
 process.stdin.on('end', function() {
+	process.stdout.write(buffer);
 	process.exit(0); 
 });

@@ -1,11 +1,12 @@
 {
   "name": "js-env-compile",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "js-env-compile ==============",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin" : { "jsenv" : "./bin/jsenv" },
   "repository": {
     "type": "git",
     "url": "git://github.com/mako-taco/js-env-compile.git"

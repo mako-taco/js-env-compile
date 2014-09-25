@@ -18,7 +18,7 @@ process.stdin.setEncoding('utf8');
 
 function processBuffer() {
 	var lines = buffer.split('\n');
-	buffer = lines.pop() + '\n';
+	buffer = lines.pop();
 
 	lines.forEach(function (line) {
 		line += '\n';
